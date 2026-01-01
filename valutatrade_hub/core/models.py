@@ -6,7 +6,6 @@ from typing import Dict, Optional
 
 class User:
     """Представляет пользователя системы"""
-
     def __init__(self,
                 user_id: int,
                 username: str, 
@@ -121,19 +120,12 @@ class Wallet:
 
         self._balance = float(value)
 
-
-
-
-
     def deposit(self, amount: float) -> None:
         """Пополние баланса"""
         if not isinstance(amount, (int, float)) or amount <= 0:
             raise ValueError("Сумма пополнения должна быть положительным числом")
 
         self._balance += amount
-
-
-
 
 
     def withdraw(self, amount: float) -> None:

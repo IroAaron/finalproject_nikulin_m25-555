@@ -1,10 +1,10 @@
 import hashlib
 import secrets
 from datetime import datetime
-from typing import Optional, Dict, Any, List
+from typing import Any, Dict, List, Optional
 
-from valutatrade_hub.core.models import User
 from valutatrade_hub.core import utils
+from valutatrade_hub.core.models import User
 
 
 class UserError(Exception):
@@ -91,7 +91,8 @@ class UseCases:
                 return portfolio
         return None
 
-    def _save_portfolio_for_user(self, user_id: int, portfolio_dict: Dict[str, Any]) -> None:
+    def _save_portfolio_for_user(self, user_id: int, 
+                                 portfolio_dict: Dict[str, Any]) -> None:
         """Сохранение портфеля для пользователя"""
         portfolios = self._load_portfolios()
         for i, p in enumerate(portfolios):
@@ -113,7 +114,8 @@ class UseCases:
 
         supported = ["USD", "EUR", "RUB", "BTC", "ETH"]
         if from_curr not in supported or to_curr not in supported:
-            raise UserError(f"Курс {from_curr}->{to_curr} недоступен. Поддерживаемые валюты: {', '.join(supported)}")
+            raise UserError(f"Курс {from_curr} → {to_curr} недоступен. " \
+                            "Поддерживаемые валюты: {', '.join(supported)}")
 
         def to_usd(code: str, amount: float) -> float:
             if code == "USD":
@@ -166,7 +168,8 @@ class UseCases:
         # Создание пустого портфеля
         self._save_portfolio_for_user(user_id, {"user_id": user_id, "wallets": {}})
 
-        return f"Пользователь '{username}' зарегистрирован (id={user_id}). Войдите: login --username {username} --password ****"
+        return f"Пользователь '{username}' зарегистрирован (id={user_id}). " \
+            f"Войдите: login --username {username} --password ****"
 
     def login_user(self, username: str, password: str) -> str:
         """Авторизация пользователя"""
@@ -206,7 +209,8 @@ class UseCases:
             balance = wallet["balance"]
             if code == base:
                 converted = balance
-                usd_rate_base = self._get_exchange_rate(base, "USD") if base != "USD" else 1.0
+                usd_rate_base = self._get_exchange_rate(
+                    base, "USD") if base != "USD" else 1.0
                 total_usd += balance * usd_rate_base
             else:
                 try:
@@ -216,9 +220,10 @@ class UseCases:
                     total_usd += balance * usd_rate
                 except UserError:
                     converted = 0.0
-            lines.append(f"- {code}: {balance:.4f} -> {converted:.2f} {base}")
+            lines.append(f"- {code}: {balance:.4f} → {converted:.2f} {base}")
 
-        total_in_base = total_usd / (self._get_exchange_rate("USD", base) if base != "USD" else 1.0)
+        total_in_base = total_usd / (
+            self._get_exchange_rate("USD", base) if base != "USD" else 1.0)
 
         result = f"Портфель пользователя '{user.username}' (база: {base}):\n"
         result += "\n".join(lines)
@@ -253,7 +258,8 @@ class UseCases:
         if rate is not None:
             result += f" по курсу {rate:,.2f} USD/{currency}"
             result += f"\nОценочная стоимость покупки: {cost_usd:,.2f} USD"
-        result += f"\nИзменения в портфеле:\n- {currency}: было {old_balance:.4f} -> стало {old_balance + amount:.4f}"
+        result += f"\nИзменения в портфеле:\n- {currency}: " \
+                f"было {old_balance:.4f} → стало {old_balance + amount:.4f}"
         return result
 
     def sell_currency(self, currency: str, amount: float) -> str:
@@ -267,11 +273,15 @@ class UseCases:
 
         portfolio_data = self._get_portfolio_by_user_id(user.user_id)
         if currency not in portfolio_data["wallets"]:
-            raise UserError(f"У вас нет кошелька '{currency}'. Добавьте валюту: она создаётся автоматически при первой покупке.")
+            raise UserError(f"У вас нет кошелька '{currency}'. " \
+                            "Добавьте валюту: она создаётся автоматически " \
+                            "при первой покупке.")
 
         balance = portfolio_data["wallets"][currency]["balance"]
         if amount > balance:
-            raise UserError(f"Недостаточно средств: доступно {balance:.4f} {currency}, требуется {amount:.4f} {currency}")
+            raise UserError(f"Недостаточно средств: доступно " \
+                            f"{balance:.4f} {currency}, требуется " \
+                            f"{amount:.4f} {currency}")
 
         old_balance = balance
         portfolio_data["wallets"][currency]["balance"] = old_balance - amount
@@ -288,7 +298,8 @@ class UseCases:
         if rate is not None:
             result += f" по курсу {rate:,.2f} USD/{currency}"
             result += f"\nОценочная выручка: {revenue_usd:,.2f} USD"
-        result += f"\nИзменения в портфеле:\n- {currency}: было {old_balance:.4f} -> стало {old_balance - amount:.4f}"
+        result += f"\nИзменения в портфеле:\n- {currency}: " \
+            f"было {old_balance:.4f} → стало {old_balance - amount:.4f}"
         return result
 
     def get_exchange_rate(self, from_curr: str, to_curr: str) -> str:
@@ -303,8 +314,11 @@ class UseCases:
             reverse_rate = self._get_exchange_rate(to_curr, from_curr)
             rates = self._load_rates()
             updated_at = rates.get("last_refresh", "неизвестно")
-            return f"Курс {from_curr}->{to_curr}: {rate:.6f} (обновлено: {updated_at})\nОбратный курс {to_curr}->{from_curr}: {reverse_rate:.2f}"
+            return f"Курс {from_curr} → {to_curr}: {rate:.6f} " \
+            f"(обновлено: {updated_at})\nОбратный курс {to_curr} → {from_curr}: " \
+            f"{reverse_rate:.2f}"
         except UserError:
             raise
         except Exception:
-            raise UserError(f"Курс {from_curr}->{to_curr} недоступен. Повторите попытку позже.")
+            raise UserError(f"Курс {from_curr} → {to_curr} недоступен. "
+                            "Повторите попытку позже.")

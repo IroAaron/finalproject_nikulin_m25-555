@@ -2,7 +2,6 @@ import shlex
 
 from valutatrade_hub.core.usecases import UseCases, UserError
 
-
 # Глобальный экземпляр бизнес-логики
 _usecases = UseCases(
     users_file='data/users.json',
