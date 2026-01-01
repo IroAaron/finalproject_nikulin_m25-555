@@ -1,15 +1,18 @@
 import hashlib
 import secrets
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
+from valutatrade_hub.core.currencies import CurrencyNotFoundError, get_currency
+from valutatrade_hub.core.exceptions import (
+    ApiRequestError,
+    InsufficientFundsError,
+    UserError,
+)
 from valutatrade_hub.core.models import User
-from valutatrade_hub.core.currencies import get_currency, CurrencyNotFoundError
-from valutatrade_hub.core.exceptions import UserError, InsufficientFundsError, ApiRequestError
-from valutatrade_hub.infra.settings import SettingsLoader
-from valutatrade_hub.infra.database import DatabaseManager
 from valutatrade_hub.decorators import log_action
-
+from valutatrade_hub.infra.database import DatabaseManager
+from valutatrade_hub.infra.settings import SettingsLoader
 
 # Глобальная сессия
 _current_user: Optional[User] = None
@@ -64,7 +67,7 @@ class UseCases:
 
         supported = ["USD", "EUR", "RUB", "BTC", "ETH"]
         if from_curr not in supported or to_curr not in supported:
-            raise CurrencyNotFoundError(f"Валюта не поддерживается")
+            raise CurrencyNotFoundError("Валюта не поддерживается")
 
         def to_usd(code: str, amount: float) -> float:
             """Конвертация из указанной валюты в USD"""

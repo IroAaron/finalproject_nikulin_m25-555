@@ -1,8 +1,12 @@
 import shlex
 
-
+from valutatrade_hub.core.exceptions import (
+    ApiRequestError,
+    CurrencyNotFoundError,
+    InsufficientFundsError,
+    UserError,
+)
 from valutatrade_hub.core.usecases import UseCases
-from valutatrade_hub.core.exceptions import InsufficientFundsError, CurrencyNotFoundError, ApiRequestError, UserError
 
 # Глобальный экземпляр бизнес-логики
 _usecases = UseCases()
@@ -136,7 +140,8 @@ def run_cli() -> None:
             print(f"Ошибка: {e}")
         except CurrencyNotFoundError as e:
             print(f"Ошибка: {e}")
-            print("Поддерживаемые валюты: USD, EUR, RUB, BTC, ETH. Введите 'help' для справки.")
+            print("Поддерживаемые валюты: USD, EUR, RUB, BTC, ETH. " \
+            "Введите 'help' для справки.")
         except ApiRequestError as e:
             print(f"Ошибка: {e}")
             print("Повторите попытку позже или проверьте подключение к сети.")

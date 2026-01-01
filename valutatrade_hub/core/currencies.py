@@ -4,7 +4,8 @@ class InsufficientFundsError(Exception):
         self.available = available
         self.required = required
         self.code = code
-        message = f"Недостаточно средств: доступно {available} {code}, требуется {required} {code}"
+        message = f"Недостаточно средств: доступно {available} {code}, " \
+        f"требуется {required} {code}"
         super().__init__(message)
 
 
