@@ -1,0 +1,15 @@
+{
+  "users_file" : "data/users.json",
+  "portfolios_file" : "data/portfolios.json",
+  "rates_file" : "data/rates.json",
+  "logs_dir": "logs",
+  "rates_ttl_seconds": 300,
+  "default_base_currency": "USD",
+  "log_level": "INFO",
+  "log_format": "%(levelname)s %(asctime)s %(message)s",
+  "default_initial_balance": 10000.0,
+  "min_transaction_amount": 0.00000001,
+  "max_transaction_amount": 1000000.0,
+  "password_min_length": 4,
+  "username_min_length": 3
+}

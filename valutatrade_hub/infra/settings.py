@@ -2,7 +2,6 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-
 class SettingsLoader:
     """Синглтон для загрузки конфигурации из config.json."""
     _instance: Optional['SettingsLoader'] = None

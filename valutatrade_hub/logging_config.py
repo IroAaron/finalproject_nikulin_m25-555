@@ -28,11 +28,6 @@ def setup_logging() -> None:
         encoding="utf-8"
     )
     log_format = settings.get("log_format", "%(levelname)s %(asctime)s %(message)s")
-    formatter = logging.Formatter(log_format, datefmt="%Y-%m-%dT%H:%M:%S")
+    formatter = logging.Formatter(fmt=log_format, datefmt="%Y-%m-%dT%H:%M:%S")
     handler.setFormatter(formatter)
     logger.addHandler(handler)
-
-    # Вывод логов в консоль
-   # console = logging.StreamHandler()
-   # console.setFormatter(formatter)
-   # logger.addHandler(console)

@@ -48,7 +48,7 @@ class UseCases:
         for i, p in enumerate(portfolios):
             if p["user_id"] == user_id:
                 portfolios[i] = portfolio_dict
-                self._save_portfolios(portfolios)
+                self.db.save_portfolios(portfolios)
                 return
         portfolios.append(portfolio_dict)
         self.db.save_portfolios(portfolios)

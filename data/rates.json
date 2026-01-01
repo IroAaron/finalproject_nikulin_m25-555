@@ -1,1 +1,107 @@
-
+{
+  "pairs": {
+    "BTC_USD": {
+      "from_currency": "BTC",
+      "to_currency": "USD",
+      "rate": 89424.0,
+      "updated_at": "2025-12-22T18:50:45.664848+00:00",
+      "source": "combined_update"
+    },
+    "ETH_USD": {
+      "from_currency": "ETH",
+      "to_currency": "USD",
+      "rate": 3027.9,
+      "updated_at": "2025-12-22T18:50:45.664848+00:00",
+      "source": "combined_update"
+    },
+    "SOL_USD": {
+      "from_currency": "SOL",
+      "to_currency": "USD",
+      "rate": 127.18,
+      "updated_at": "2025-12-22T18:50:45.664848+00:00",
+      "source": "combined_update"
+    },
+    "BNB_USD": {
+      "from_currency": "BNB",
+      "to_currency": "USD",
+      "rate": 868.14,
+      "updated_at": "2025-12-22T18:50:45.664848+00:00",
+      "source": "combined_update"
+    },
+    "ADA_USD": {
+      "from_currency": "ADA",
+      "to_currency": "USD",
+      "rate": 0.379301,
+      "updated_at": "2025-12-22T18:50:45.664848+00:00",
+      "source": "combined_update"
+    },
+    "EUR_USD": {
+      "from_currency": "EUR",
+      "to_currency": "USD",
+      "rate": 0.8538,
+      "updated_at": "2025-12-22T18:50:45.664848+00:00",
+      "source": "combined_update"
+    },
+    "GBP_USD": {
+      "from_currency": "GBP",
+      "to_currency": "USD",
+      "rate": 0.7474,
+      "updated_at": "2025-12-22T18:50:45.664848+00:00",
+      "source": "combined_update"
+    },
+    "JPY_USD": {
+      "from_currency": "JPY",
+      "to_currency": "USD",
+      "rate": 157.5619,
+      "updated_at": "2025-12-22T18:50:45.664848+00:00",
+      "source": "combined_update"
+    },
+    "CAD_USD": {
+      "from_currency": "CAD",
+      "to_currency": "USD",
+      "rate": 1.3795,
+      "updated_at": "2025-12-22T18:50:45.664848+00:00",
+      "source": "combined_update"
+    },
+    "AUD_USD": {
+      "from_currency": "AUD",
+      "to_currency": "USD",
+      "rate": 1.513,
+      "updated_at": "2025-12-22T18:50:45.664848+00:00",
+      "source": "combined_update"
+    },
+    "CHF_USD": {
+      "from_currency": "CHF",
+      "to_currency": "USD",
+      "rate": 0.7955,
+      "updated_at": "2025-12-22T18:50:45.664848+00:00",
+      "source": "combined_update"
+    },
+    "CNY_USD": {
+      "from_currency": "CNY",
+      "to_currency": "USD",
+      "rate": 7.0485,
+      "updated_at": "2025-12-22T18:50:45.664848+00:00",
+      "source": "combined_update"
+    },
+    "RUB_USD": {
+      "from_currency": "RUB",
+      "to_currency": "USD",
+      "rate": 80.5354,
+      "updated_at": "2025-12-22T18:50:45.664848+00:00",
+      "source": "combined_update"
+    }
+  },
+  "last_refresh": "2025-12-22T18:50:45.664848+00:00",
+  "sources": [
+    "combined_update"
+  ],
+  "total_pairs": 13,
+  "meta": {
+    "sources": [
+      "coingecko",
+      "exchangerate"
+    ],
+    "update_time": "2025-12-22T18:50:45.664479+00:00"
+  }
+}

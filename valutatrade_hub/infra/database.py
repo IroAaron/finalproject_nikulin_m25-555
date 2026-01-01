@@ -5,7 +5,6 @@ from typing import Any, Dict, List
 from valutatrade_hub.core import utils
 from valutatrade_hub.infra.settings import SettingsLoader
 
-
 class DatabaseManager:
     """Управление локальной БД"""
     _instance = None
