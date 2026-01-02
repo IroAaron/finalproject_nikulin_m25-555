@@ -17,7 +17,8 @@ class InsufficientFundsError(ValutaTradeError):
         self.available = available
         self.required = required
         self.code = code
-        super().__init__(f'Ошибка: Недостаточно средств: доступно {available} {code}, требуется {required} {code}')
+        super().__init__(f"Ошибка: Недостаточно средств: доступно " \
+                         f"{available} {code}, требуется {required} {code}")
 
 
 class CurrencyNotFoundError(ValutaTradeError):

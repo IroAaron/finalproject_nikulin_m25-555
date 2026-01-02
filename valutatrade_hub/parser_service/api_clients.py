@@ -55,7 +55,9 @@ class BaseApiClient:
             except requests.exceptions.RequestException as e:
                 last_error = e
                 if attempt == self.config.REQUEST_RETRIES - 1:
-                    raise ApiRequestError(f'Не удалось выполнить запрос после {self.config.REQUEST_RETRIES} попыток: {last_error}')
+                    raise ApiRequestError(f"Не удалось выполнить запрос после " \
+                                          f"{self.config.REQUEST_RETRIES} попыток: " \
+                                            f"{last_error}")
                 
                 time.sleep(self.config.RETRY_DELAY * (attempt + 1))
         

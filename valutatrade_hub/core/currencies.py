@@ -43,8 +43,10 @@ class CryptoCurrency(Currency):
         self._market_cap = market_cap
     
     def get_display_info(self) -> str:
-        mcap_str = f'{self._market_cap:.2e}' if self._market_cap > 1e6 else f'{self._market_cap:,.2f}'
-        return f'[CRYPTO] {self._code} — {self._name} (Algo: {self._algorithm}, MCAP: {mcap_str})'
+        mcap_str = f'{self._market_cap:.2e}' if self._market_cap > 1e6 else f'{
+            self._market_cap:,.2f}'
+        return f"[CRYPTO] {self._code} — {self._name} " \
+            f"(Algo: {self._algorithm}, MCAP: {mcap_str})"
 
 # Реестр валют
 class CurrencyRegistry:
@@ -81,7 +83,8 @@ def initialize_currencies():
     CurrencyRegistry.register_currency(CryptoCurrency('Ethereum', 'ETH', 'Ethash', 4.5e11))
     CurrencyRegistry.register_currency(CryptoCurrency('Solana', 'SOL', 'Proof of History', 6.8e10))
     CurrencyRegistry.register_currency(CryptoCurrency('Cardano', 'ADA', 'Ouroboros', 2.3e10))
-    CurrencyRegistry.register_currency(CryptoCurrency('Polkadot', 'DOT', 'Nominated Proof-of-Stake', 1.2e10))
+    CurrencyRegistry.register_currency(CryptoCurrency('Polkadot', 'DOT', 
+                                                      'Nominated Proof-of-Stake', 1.2e10))
 
 # Фабричный метод
 def get_currency(code: str) -> Currency:

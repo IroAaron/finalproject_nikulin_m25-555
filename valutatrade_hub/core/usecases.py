@@ -121,7 +121,8 @@ class UserManager:
 
 class PortfolioManager:
     @log_action('BUY', verbose=True)
-    def buy_currency(self, user_id: int, currency_code: str, amount: float, base_currency: str = 'USD') -> Dict[str, Any]:
+    def buy_currency(self, user_id: int, currency_code: str, 
+                     amount: float, base_currency: str = 'USD') -> Dict[str, Any]:
         '''
         Покупка валюты с списанием базовой валюты
         '''
@@ -162,7 +163,8 @@ class PortfolioManager:
         }
 
     @log_action('SELL', verbose=True)
-    def sell_currency(self, user_id: int, currency_code: str, amount: float, base_currency: str = 'USD') -> Dict[str, Any]:
+    def sell_currency(self, user_id: int, currency_code: str, 
+                      amount: float, base_currency: str = 'USD') -> Dict[str, Any]:
         '''
         Продажа валюты с зачислением базовой валюты
         '''

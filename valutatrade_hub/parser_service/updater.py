@@ -13,7 +13,8 @@ class ParserStorage:
     '''
     
     def save_exchange_rate(self, rate_data):
-        print(f'Saving rate: {rate_data['from_currency']}_{rate_data['to_currency']} = {rate_data['rate']}')
+        print(f"Saving rate: {rate_data['from_currency']}_{rate_data['to_currency']} " \
+              f"''= {rate_data['rate']}")
     
     def save_current_rates(self, rates, source):
         print(f'Saving {len(rates)} current rates from {source}')

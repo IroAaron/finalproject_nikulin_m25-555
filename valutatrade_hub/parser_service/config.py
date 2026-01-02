@@ -80,7 +80,8 @@ class ParserConfig:
         # Проверяем коды валют
         if not all(currency.isalpha() and currency.isupper() 
                   for currency in self.FIAT_CURRENCIES + self.CRYPTO_CURRENCIES):
-            raise ValueError('Ошибка: Коды валют должны быть в верхнем регистре и содержать только буквы')
+            raise ValueError('Ошибка: Коды валют должны быть в верхнем регистре ' \
+            'и содержать только буквы')
         
         # Создаем директорию для данных
         data_dir = os.path.dirname(self.RATES_FILE_PATH)
@@ -112,4 +113,5 @@ class ParserConfig:
         '''
         Получение URL для запроса к ExchangeRate-API (требует ключ)
         '''
-        return f'{self.EXCHANGERATE_API_URL}/{self.EXCHANGERATE_API_KEY}/latest/{self.BASE_CURRENCY}'
+        return f"{self.EXCHANGERATE_API_URL}/" \
+            f"{self.EXCHANGERATE_API_KEY}/latest/{self.BASE_CURRENCY}"

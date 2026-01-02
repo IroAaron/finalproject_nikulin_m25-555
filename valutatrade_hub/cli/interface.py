@@ -444,7 +444,8 @@ class InteractiveCLI:
             for currency_code, wallet in portfolio.wallets.items():
                 if wallet.balance > 0 and currency_code != 'USD':
                     available_currencies.append(currency_code)
-                    balance_str = f'{wallet.balance:.8f}' if currency_code in ['BTC', 'ETH'] else f'{wallet.balance:.4f}'
+                    balance_str = f'{wallet.balance:.8f}' if currency_code in [
+                        'BTC', 'ETH'] else f'{wallet.balance:.4f}'
                     print(f'  {currency_code}: {balance_str}')
             
             if not available_currencies:
@@ -456,7 +457,8 @@ class InteractiveCLI:
             currency_code = self.get_user_input('Код валюты для продажи: ').upper()
             
             if currency_code not in available_currencies:
-                print(f'\nОшибка: У вас нет валюты {currency_code} для продажи или валюта недоступна!')
+                print(f"\nОшибка: У вас нет валюты {currency_code} " \
+                      "для продажи или валюта недоступна!")
                 self.wait_for_enter()
                 return
             
@@ -475,7 +477,8 @@ class InteractiveCLI:
                 rate = self.rate_manager.get_rate(currency_code, 'USD')
                 revenue = amount * rate
                 
-                current_usd_balance = portfolio.wallets['USD'].balance if 'USD' in portfolio.wallets else 0
+                current_usd_balance = portfolio.wallets[
+                    'USD'].balance if 'USD' in portfolio.wallets else 0
                 
                 print('\n Детали продажи:')
                 print(f'   Валюта: {currency_code}')
@@ -650,7 +653,8 @@ class InteractiveCLI:
         print('КУРСЫ ВАЛЮТ')
         print('-'*50)
         if not self.rate_manager.is_rates_data_fresh():
-               print('Предупреждение: Данные о курсах могут быть устаревшими. Рекомендуется обновить курсы.')
+               print('Предупреждение: Данные о курсах могут быть устаревшими. ' \
+               'Рекомендуется обновить курсы.')
         print(table)
         print(f'\nВсего валют: {len(rates)}')
     
@@ -716,7 +720,8 @@ class InteractiveCLI:
             try:
                 self.show_main_menu()
                 
-                choice = input('Список доступных команд (введите текстовую команду или число 1-12): ').strip()
+                choice = input('Список доступных команд ' \
+                '(введите текстовую команду или число 1-12): ').strip()
                 
                 command = self.get_command(choice)
                 
@@ -724,7 +729,8 @@ class InteractiveCLI:
                     _, handler = self.menu_options[command]
                     handler()
                 else:
-                    print(f'\n Ошибка: Неверный выбор: "{choice}"! Пожалуйста, выберите от 1 до 12 или используйте команды из меню.')
+                    print(f"\n Ошибка: Неверный выбор: '{choice}'! " \
+                    "Пожалуйста, выберите от 1 до 12 или используйте команды из меню.")
                     self.wait_for_enter()
             
             except KeyboardInterrupt:
