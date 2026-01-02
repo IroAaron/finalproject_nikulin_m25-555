@@ -1,123 +1,90 @@
+# valutatrade_hub/core/currencies.py
 from abc import ABC, abstractmethod
-import re
 from typing import Dict
 
+from .exceptions import CurrencyNotFoundError
 
-class CurrencyNotFoundError(Exception):
-    """Исключение, вызываемое при отсутствии валюты с указанным кодом"""
-    pass
 
 class Currency(ABC):
-    """Абстрактный базовый класс валюты"""
-
-    def __init__(self, name: str, code: str) -> None:
-        self.name = name
-        self.code = code
-
+    def __init__(self, name: str, code: str):
+        if not code or len(code) < 2 or len(code) > 5 or not code.isalpha():
+            raise ValueError('Ошибка: Код валюты должен быть 2-5 символов в верхнем регистре')
+        if not name or not name.strip():
+            raise ValueError('Ошибка: Название валюты не может быть пустым')
+        
+        self._name = name
+        self._code = code.upper()
+    
     @property
     def name(self) -> str:
-        """Отображаемое имя валюты"""
         return self._name
-
-    @name.setter
-    def name(self, value: str) -> None:
-        if not isinstance(value, str) or not value.strip():
-            raise ValueError("Имя валюты не может быть пустым")
-        self._name = value.strip()
-
+    
     @property
     def code(self) -> str:
-        """Код валюты"""
         return self._code
-
-    @code.setter
-    def code(self, value: str) -> None:
-        if not isinstance(value, str):
-            raise TypeError("Код валюты должен быть строкой")
-        clean_value = value.strip().upper()
-        if not clean_value:
-            raise ValueError("Код валюты не может быть пустым")
-        if not (2 <= len(clean_value) <= 5):
-            raise ValueError("Код валюты должен содержать от 2 до 5 символов")
-        if not re.match(r"^[A-Z0-9]+$", clean_value):
-            raise ValueError("Код валюты может содержать только буквы и цифры")
-        self._code = clean_value
-
+    
     @abstractmethod
     def get_display_info(self) -> str:
-        """Форматированное представление валюты для логов"""
         pass
 
 class FiatCurrency(Currency):
-    """Фиатная валюта, эмитируемая государством или зоной"""
-
-    def __init__(self, name: str, code: str, issuing_country: str) -> None:
+    def __init__(self, name: str, code: str, issuing_country: str):
         super().__init__(name, code)
-        self.issuing_country = issuing_country
-
-    @property
-    def issuing_country(self) -> str:
-        """Страна или зона эмиссии"""
-        return self._issuing_country
-
-    @issuing_country.setter
-    def issuing_country(self, value: str) -> None:
-        if not isinstance(value, str) or not value.strip():
-            raise ValueError("Страна эмиссии не может быть пустой")
-        self._issuing_country = value.strip()
-
+        self._issuing_country = issuing_country
+    
     def get_display_info(self) -> str:
-        """Форматированное отображение фиатной валюты"""
-        return f"[FIAT] {self.code} — {self.name} (Issuing: {self._issuing_country})"
-
+        return f'[FIAT] {self._code} — {self._name} (Issuing: {self._issuing_country})'
+    
 
 class CryptoCurrency(Currency):
-    """Криптовалюта с алгоритмом и рыночной капитализацией"""
-
-    def __init__(self, name: str, code: str, algorithm: str, market_cap: float) -> None:
+    def __init__(self, name: str, code: str, algorithm: str, market_cap: float = 0.0):
         super().__init__(name, code)
-        self.algorithm = algorithm
-        self.market_cap = market_cap
-
-    @property
-    def algorithm(self) -> str:
-        """Алгоритм консенсуса"""
-        return self._algorithm
-
-    @algorithm.setter
-    def algorithm(self, value: str) -> None:
-        if not isinstance(value, str) or not value.strip():
-            raise ValueError("Алгоритм не может быть пустым")
-        self._algorithm = value.strip()
-
-    @property
-    def market_cap(self) -> float:
-        """Рыночная капитализация в USD"""
-        return self._market_cap
-
-    @market_cap.setter
-    def market_cap(self, value: float) -> None:
-        if not isinstance(value, (int, float)) or value < 0:
-            raise ValueError("Рыночная капитализация должна быть неотрицательным числом")
-        self._market_cap = float(value)
-
+        self._algorithm = algorithm
+        self._market_cap = market_cap
+    
     def get_display_info(self) -> str:
-        """Форматированное отображение криптовалюты"""
-        return f"[CRYPTO] {self.code} — {self.name} (Algo: {self._algorithm}, MCAP: {self._market_cap:.2e})"
+        mcap_str = f'{self._market_cap:.2e}' if self._market_cap > 1e6 else f'{self._market_cap:,.2f}'
+        return f'[CRYPTO] {self._code} — {self._name} (Algo: {self._algorithm}, MCAP: {mcap_str})'
 
-# Реестр поддерживаемых валют
-SUPPORTED_CURRENCIES: Dict[str, Currency] = {
-    "USD": FiatCurrency("US Dollar", "USD", "United States"),
-    "EUR": FiatCurrency("Euro", "EUR", "Eurozone"),
-    "RUB": FiatCurrency("Russian Ruble", "RUB", "Russian Federation"),
-    "BTC": CryptoCurrency("Bitcoin", "BTC", "SHA-256", 1.12e12),
-    "ETH": CryptoCurrency("Ethereum", "ETH", "Ethash", 4.5e11),
-    "SOL": CryptoCurrency("Solana", "SOL", "Proof of History", 8.5e10),
-}
+# Реестр валют
+class CurrencyRegistry:
+    _currencies: Dict[str, Currency] = {}
+    
+    @classmethod
+    def register_currency(cls, currency: Currency):
+        cls._currencies[currency.code] = currency
+    
+    @classmethod
+    def get_currency(cls, code: str) -> Currency:
+        code = code.upper()
+        if code not in cls._currencies:
+            raise CurrencyNotFoundError(code)
+        return cls._currencies[code]
+    
+    @classmethod
+    def get_all_currencies(cls) -> Dict[str, Currency]:
+        return cls._currencies.copy()
 
+# Инициализация реестра
+def initialize_currencies():
+    '''
+    Инициализация базового набора валют
+    '''
+    CurrencyRegistry.register_currency(FiatCurrency('US Dollar', 'USD', 'United States'))
+    CurrencyRegistry.register_currency(FiatCurrency('Euro', 'EUR', 'Eurozone'))
+    CurrencyRegistry.register_currency(FiatCurrency('British Pound', 'GBP', 'United Kingdom'))
+    CurrencyRegistry.register_currency(FiatCurrency('Russian Ruble', 'RUB', 'Russia'))
+    CurrencyRegistry.register_currency(FiatCurrency('Japanese Yen', 'JPY', 'Japan'))
+    CurrencyRegistry.register_currency(FiatCurrency('Chinese Yuan', 'CNY', 'China'))
+    
+    CurrencyRegistry.register_currency(CryptoCurrency('Bitcoin', 'BTC', 'SHA-256', 1.12e12))
+    CurrencyRegistry.register_currency(CryptoCurrency('Ethereum', 'ETH', 'Ethash', 4.5e11))
+    CurrencyRegistry.register_currency(CryptoCurrency('Solana', 'SOL', 'Proof of History', 6.8e10))
+    CurrencyRegistry.register_currency(CryptoCurrency('Cardano', 'ADA', 'Ouroboros', 2.3e10))
+    CurrencyRegistry.register_currency(CryptoCurrency('Polkadot', 'DOT', 'Nominated Proof-of-Stake', 1.2e10))
+
+# Фабричный метод
 def get_currency(code: str) -> Currency:
-    """Получение объекта валюты по её коду"""
-    code = code.strip().upper()
-    if code not in SUPPORTED_CURRENCIES:
-        raise CurrencyNotFoundError(f"Валюта с кодом '{code}' не поддерживается")
-    return SUPPORTED_CURRENCIES[code]
+    return CurrencyRegistry.get_currency(code)
+    
+    

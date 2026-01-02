@@ -1,61 +1,84 @@
+# valutatrade_hub/parser_service/sheduler.py
 import threading
+import time
 from typing import Optional
 
-from valutatrade_hub.parser_service.updater import RatesUpdater
-from valutatrade_hub.parser_service.config import ParserConfig
-import logging
-
-logger = logging.getLogger("valutatrade")
+from ..logging_config import get_logger
+from .config import ParserConfig
+from .updater import RatesUpdater
 
 
-class RatesScheduler:
-    """Планировщик периодического обновления курсов валют в фоновом режиме."""
-
-    def __init__(self, interval_seconds: int = 120):  # по умолчанию каждые две минуты
-        self.interval = interval_seconds
-        self._thread: Optional[threading.Thread] = None
+class Scheduler:
+    '''
+    Планировщик периодического обновления курсов
+    '''
+    
+    def __init__(self, config: ParserConfig = None):
+        self.config = config or ParserConfig.from_env()
+        self.updater = RatesUpdater(config)
+        self.logger = get_logger('scheduler')
         self._stop_event = threading.Event()
-        self.config = ParserConfig()
-        self.updater = RatesUpdater(self.config)
-
-    def _run(self) -> None:
-        """Основной цикл обновления"""
-        logger.info(f"Планировщик запущен. Интервал: {self.interval} секунд")
-        while not self._stop_event.wait(self.interval):
-            try:
-                logger.info("Планировщик: запуск обновления курсов...")
-                count = self.updater.run_update()
-                logger.info(f"Планировщик: обновлено {count} курсов")
-            except Exception as e:
-                logger.error(f"Планировщик: ошибка при обновлении — {e}")
-
-    def start(self) -> None:
-        """Запуск фонового потока с первым обновлением"""
-        if self._thread is not None and self._thread.is_alive():
-            logger.warning("Планировщик уже запущен")
+        self._thread: Optional[threading.Thread] = None
+        self._is_running = False
+    
+    def start(self):
+        '''
+        Запуск планировщика в отдельном потоке
+        '''
+        if self._is_running:
+            self.logger.warning('Scheduler is already running')
             return
         
         self._stop_event.clear()
-        
-        try:
-            logger.info("Планировщик: первое обновление курсов при старте...")
-            count = self.updater.run_update()
-            logger.info(f"Планировщик: первое обновление завершено. Получено {count} курсов")
-        except Exception as e:
-            logger.error(f"Планировщик: ошибка при первом обновлении — {e}")
-        
-        # Запуск фонового потока для периодических обновлений
-        self._thread = threading.Thread(target=self._run, daemon=True)
+        self._thread = threading.Thread(target=self._run_loop, daemon=True)
         self._thread.start()
-        logger.info("Планировщик активирован")
-
-    def stop(self) -> None:
-        """Остановка фонового потока"""
-        if self._thread is not None:
-            self._stop_event.set()
-            self._thread.join(timeout=2.0)
-            logger.info("Планировщик остановлен")
-
+        self._is_running = True
+        self.logger.info('Scheduler started')
+    
+    def stop(self):
+        '''
+        Остановка планировщика
+        '''
+        if not self._is_running:
+            return
+            
+        self._stop_event.set()
+        if self._thread:
+            self._thread.join(timeout=3)
+        self._is_running = False
+        self.logger.info('Scheduler stopped')
+    
+    def _run_loop(self):
+        '''
+        Основной цикл планировщика
+        '''
+        while not self._stop_event.is_set():
+            try:
+                self.logger.debug('Running scheduled update...')
+                self.updater.run_update()
+                
+                wait_time = self.config.UPDATE_INTERVAL_MINUTES * 60
+                for _ in range(wait_time * 2):
+                    if self._stop_event.is_set():
+                        break
+                    time.sleep(0.5)
+                
+            except Exception as e:
+                self.logger.error(f'Scheduler error: {e}')
+                for _ in range(60):
+                    if self._stop_event.is_set():
+                        break
+                    time.sleep(0.5)
+    
+    def run_once(self):
+        '''
+        Однократный запуск обновления
+        '''
+        return self.updater.run_update()
+    
+    @property
     def is_running(self) -> bool:
-        """Проверка, запущен ли планировщик"""
-        return self._thread is not None and self._thread.is_alive()
+        '''
+        Проверка запущен ли планировщик
+        '''
+        return self._is_running and self._thread and self._thread.is_alive()

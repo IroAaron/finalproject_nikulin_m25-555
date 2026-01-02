@@ -1,1 +1,38 @@
-
+[
+  {
+    "timestamp": "2026-01-02T18:14:30.408356",
+    "source": "coingecko, exchangerate",
+    "base_currency": "USD",
+    "rates": {
+      "BTC_USD": 89112,
+      "ETH_USD": 3070.26,
+      "SOL_USD": 128.48,
+      "ADA_USD": 0.368187,
+      "DOT_USD": 1.99,
+      "EUR_USD": 0.8513,
+      "GBP_USD": 0.7427,
+      "RUB_USD": 78.9235,
+      "JPY_USD": 156.7298,
+      "CNY_USD": 6.9974
+    },
+    "total_pairs": 10
+  },
+  {
+    "timestamp": "2026-01-02T18:14:55.164221",
+    "source": "coingecko, exchangerate",
+    "base_currency": "USD",
+    "rates": {
+      "BTC_USD": 89112,
+      "ETH_USD": 3070.26,
+      "SOL_USD": 128.48,
+      "ADA_USD": 0.368187,
+      "DOT_USD": 1.99,
+      "EUR_USD": 0.8513,
+      "GBP_USD": 0.7427,
+      "RUB_USD": 78.9235,
+      "JPY_USD": 156.7298,
+      "CNY_USD": 6.9974
+    },
+    "total_pairs": 10
+  }
+]

@@ -1,60 +1,68 @@
-import json
-import os
-import tempfile
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Dict, Any
+# valutatrade_hub/parser_service/storage.py
+from datetime import datetime
+from typing import Any, Dict, List
 
-from valutatrade_hub.parser_service.config import ParserConfig
+from ..infra.database import db
 
 
-class RatesStorage:
-    def __init__(self, config: ParserConfig):
-        self.config = config
-        self._ensure_data_dir()
-
-    def _ensure_data_dir(self) -> None:
-        Path(self.config.RATES_FILE_PATH).parent.mkdir(parents=True, exist_ok=True)
-
-    def save_snapshot(self, pairs: Dict[str, Dict[str, Any]]) -> int:
-        """Сохранение курсов в совместимом формате"""
-        data = {}
-        for pair, info in pairs.items():
-            data[pair] = {
-                "rate": info["rate"],
-                "updated_at": info["updated_at"]
-            }
-        data["last_refresh"] = max(
-            (info["updated_at"] for info in pairs.values()),
-            default=datetime.now().isoformat()
-        )
-
-        with tempfile.NamedTemporaryFile("w", delete=False, dir=Path(self.config.RATES_FILE_PATH).parent) as tmp:
-            json.dump(data, tmp, indent=2, ensure_ascii=False)
-            os.replace(tmp.name, self.config.RATES_FILE_PATH)
-        return len(pairs)
-
-    def append_to_history(self, pair: str, rate: float, source: str) -> None:
-        from_curr, to_curr = pair.split("_")
-        timestamp = datetime.now().isoformat()
-        record_id = f"{from_curr}_{to_curr}_{timestamp}"
-
-        record = {
-            "id": record_id,
-            "from_currency": from_curr,
-            "to_currency": to_curr,
-            "rate": rate,
-            "timestamp": timestamp,
-            "source": source
+class ParserStorage:
+    '''
+    Класс для работы с хранилищем данных парсера
+    '''
+    
+    def save_exchange_rate(self, rate_data: Dict[str, Any]):
+        '''
+        Сохранение одной записи о курсе в историю
+        '''
+        def update_history(history: List) -> List:
+            rate_data['id'] = self._generate_rate_id(rate_data)
+            rate_data['timestamp'] = datetime.now().isoformat()
+            
+            history.append(rate_data)
+            return history[-1000:]
+        
+        db.update_data('exchange_rates', update_history)
+    
+    def save_current_rates(self, rates: Dict[str, float], source: str):
+        '''
+        Сохранение текущих курсов в кеш
+        '''
+        current_time = datetime.now().isoformat()
+        
+        rates_data = {
+            'pairs': {},
+            'last_refresh': current_time,
+            'source': source
         }
-
-        history_path = Path(self.config.HISTORY_FILE_PATH)
-        history = []
-        if history_path.exists():
-            with open(history_path, "r", encoding="utf-8") as f:
-                history = json.load(f)
-        history.append(record)
-
-        with tempfile.NamedTemporaryFile("w", delete=False, dir=history_path.parent) as tmp:
-            json.dump(history, tmp, indent=2, ensure_ascii=False)
-            os.replace(tmp.name, history_path)
+        
+        for pair_key, rate in rates.items():
+            rates_data['pairs'][pair_key] = {
+                'rate': rate,
+                'updated_at': current_time,
+                'source': source
+            }
+        
+        db.save_data('rates', rates_data)
+    
+    def get_historical_rates(self, currency_pair: str, limit: int = 100) -> List[Dict]:
+        '''
+        Получение исторических данных по паре валют
+        '''
+        history = db.load_data('exchange_rates') or []
+        
+        filtered = [
+            record for record in history 
+            if record.get('from_currency', '').lower() == currency_pair.lower()
+        ]
+        
+        return filtered[-limit:]
+    
+    def _generate_rate_id(self, rate_data: Dict[str, Any]) -> str:
+        '''
+        Генерация уникального ID для записи курса
+        '''
+        from_currency = rate_data.get('from_currency', '')
+        to_currency = rate_data.get('to_currency', '')
+        timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        
+        return f'{from_currency}_{to_currency}_{timestamp}'

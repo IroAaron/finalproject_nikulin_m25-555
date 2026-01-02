@@ -1,33 +1,53 @@
-import logging
-from logging.handlers import RotatingFileHandler
-from pathlib import Path
+# valutatrade_hub/logging_config.py
+import logging as lg
+import logging.handlers as hd
+import os
 
-from valutatrade_hub.infra.settings import SettingsLoader
 
-
-def setup_logging() -> None:
-    """Настройка логирования"""
-    settings = SettingsLoader()
-    log_file = Path(settings.get("log_file", "logs/actions.log"))
+# Функция для настройки системы логирования
+def setup_logging():
+    '''
+    Настройка системы логирования
+    '''
+    log_dir = "logs"
+    os.makedirs(log_dir, exist_ok=True)
     
-    # Создание директории
-    log_file.parent.mkdir(parents=True, exist_ok=True)
-
-    logger = logging.getLogger("valutatrade")
-    logger.setLevel(getattr(logging, settings.get("log_level", "INFO")))
-
-    # Очистка
-    if logger.handlers:
-        logger.handlers.clear()
-
-    # Файловый обработчик
-    handler = RotatingFileHandler(
-        log_file,
-        maxBytes=int(settings.get("log_max_bytes", 5242880)),
-        backupCount=int(settings.get("log_backup_count", 3)),
-        encoding="utf-8"
+    formatter = lg.Formatter(
+        '%(asctime)s | %(levelname)-8s | %(name)s | %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
     )
-    log_format = settings.get("log_format", "%(levelname)s %(asctime)s %(message)s")
-    formatter = logging.Formatter(fmt=log_format, datefmt="%Y-%m-%dT%H:%M:%S")
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    
+    file_handler = hd.RotatingFileHandler(
+        filename=os.path.join(log_dir, 'valutatrade.log'),
+        maxBytes=10*1024*1024,  # 10 MB
+        backupCount=5,
+        encoding='utf-8'
+    )
+    file_handler.setFormatter(formatter)
+    
+    console_handler = lg.StreamHandler()
+    console_handler.setFormatter(formatter)
+    
+    root_logger = lg.getLogger()
+    root_logger.setLevel(lg.INFO)
+    root_logger.addHandler(file_handler)
+    root_logger.addHandler(console_handler)
+    
+    actions_logger = lg.getLogger('actions')
+    actions_handler = hd.RotatingFileHandler(
+        filename=os.path.join(log_dir, 'actions.log'),
+        maxBytes=5*1024*1024,
+        backupCount=3,
+        encoding='utf-8'
+    )
+    actions_handler.setFormatter(formatter)
+    actions_logger.addHandler(actions_handler)
+    actions_logger.setLevel(lg.INFO)
+    actions_logger.propagate = False
+
+
+# Функция для получения логгера
+def get_logger(name: str) -> lg.Logger:
+    return lg.getLogger(name)
+    
+    

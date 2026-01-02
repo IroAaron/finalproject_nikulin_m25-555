@@ -1,35 +1,75 @@
-import json
-from pathlib import Path
-from typing import Any, Dict, Optional
+# valutatrade_hub/infra/settings.py
+import os
+from typing import Any, Dict
+
 
 class SettingsLoader:
-    """Синглтон для загрузки конфигурации из config.json."""
-    _instance: Optional['SettingsLoader'] = None
-    _initialized: bool = False
-
-    def __new__(cls) -> 'SettingsLoader':
+    '''
+    Singleton для загрузки и управления настройками приложения
+    '''
+    _instance = None
+    _settings: Dict[str, Any] = {}
+    
+    def __new__(cls):
         if cls._instance is None:
-            cls._instance = super().__new__(cls)
+            cls._instance = super(SettingsLoader, cls).__new__(cls)
+            cls._instance._load_settings()
         return cls._instance
-
-    def __init__(self) -> None:
-        if self._initialized:
-            return
-        self._initialized = True
-        self._config: Dict[str, Any] = {}
-        self.reload()
-
-    def reload(self) -> None:
-        """Перезагрузка конфигурации из config.json"""
-        config_path = Path("config.json")
-        if not config_path.exists():
-            raise FileNotFoundError(
-                "Файл конфигурации не найден: config.json. "
-                "Создайте его в корне проекта."
-            )
-        with open(config_path, "r", encoding="utf-8") as f:
-            self._config = json.load(f)
-
+    
+    def _load_settings(self):
+        '''
+        Загрузка настроек из различных источников
+        '''
+        default_settings = {
+            'data_directory': 'data',
+            'rates_ttl_seconds': 300,
+            'default_base_currency': 'USD',
+            'log_level': 'INFO',
+            'log_file': 'logs/valutatrade.log',
+            'supported_currencies': ['USD', 'EUR', 'GBP', 'RUB', 'BTC', 'ETH', 'SOL'],
+            'api_timeout': 10
+        }
+        
+        self._settings.update(default_settings)
+        
+        try:
+            if os.path.exists('pyproject.toml'):
+                pass
+        except Exception:
+            pass
+        
+        env_mapping = {
+            'VALUTATRADE_DATA_DIR': 'data_directory',
+            'VALUTATRADE_RATES_TTL': 'rates_ttl_seconds',
+            'VALUTATRADE_LOG_LEVEL': 'log_level',
+        }
+        
+        for env_var, setting_key in env_mapping.items():
+            value = os.getenv(env_var)
+            if value:
+                if setting_key == 'rates_ttl_seconds':
+                    self._settings[setting_key] = int(value)
+                else:
+                    self._settings[setting_key] = value
+    
     def get(self, key: str, default: Any = None) -> Any:
-        """Получение значения параметра конфигурации по ключу"""
-        return self._config.get(key, default)
+        '''
+        Получение значения настройки
+        '''
+        return self._settings.get(key, default)
+    
+    def reload(self):
+        '''
+        Перезагрузка настроек
+        '''
+        self._settings.clear()
+        self._load_settings()
+    
+    def __getitem__(self, key: str) -> Any:
+        return self.get(key)
+    
+    def __setitem__(self, key: str, value: Any):
+        self._settings[key] = value
+
+# Глобальный экземпляр настроек
+settings = SettingsLoader()
