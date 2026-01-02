@@ -5,5 +5,12 @@
     "hashed_password": "5f4fb17be3e665ab8366bd852dd93b6c7531bca6e67b13d73b4a545fd01c9496",
     "salt": "72f61c60a2b9b623",
     "registration_date": "2026-01-02T18:21:16.028071"
+  },
+  {
+    "user_id": 2,
+    "username": "name",
+    "hashed_password": "5b89b0ceefc51a8904c3c0fe6fe4b82991209f7e2200999b969671343b03390c",
+    "salt": "a3827da82a26fda0",
+    "registration_date": "2026-01-02T18:48:53.932783"
   }
 ]

@@ -9,5 +9,16 @@
         "balance": 1.0
       }
     }
+  },
+  {
+    "user_id": 2,
+    "wallets": {
+      "USD": {
+        "balance": 6941.31175
+      },
+      "ETH": {
+        "balance": 0.999
+      }
+    }
   }
 ]

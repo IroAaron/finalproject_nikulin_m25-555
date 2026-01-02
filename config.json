@@ -7,7 +7,7 @@
   "default_base_currency": "USD",
   "log_level": "INFO",
   "log_format": "%(levelname)s %(asctime)s %(message)s",
-  "default_initial_balance": 10000.0,
+  "default_initial_balance": 1000000.0,
   "min_transaction_amount": 0.00000001,
   "max_transaction_amount": 1000000.0,
   "password_min_length": 4,
