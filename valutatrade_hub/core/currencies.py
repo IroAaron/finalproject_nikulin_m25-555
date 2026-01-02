@@ -4,7 +4,6 @@ from typing import Dict
 
 from .exceptions import CurrencyNotFoundError
 
-
 class Currency(ABC):
     def __init__(self, name: str, code: str):
         if not code or len(code) < 2 or len(code) > 5 or not code.isalpha():
@@ -48,7 +47,6 @@ class CryptoCurrency(Currency):
         return f"[CRYPTO] {self._code} — {self._name} " \
             f"(Algo: {self._algorithm}, MCAP: {mcap_str})"
 
-# Реестр валют
 class CurrencyRegistry:
     _currencies: Dict[str, Currency] = {}
     
@@ -67,7 +65,6 @@ class CurrencyRegistry:
     def get_all_currencies(cls) -> Dict[str, Currency]:
         return cls._currencies.copy()
 
-# Инициализация реестра
 def initialize_currencies():
     '''
     Инициализация базового набора валют
@@ -86,7 +83,6 @@ def initialize_currencies():
     CurrencyRegistry.register_currency(CryptoCurrency('Polkadot', 'DOT', 
                                                       'Nominated Proof-of-Stake', 1.2e10))
 
-# Фабричный метод
 def get_currency(code: str) -> Currency:
     return CurrencyRegistry.get_currency(code)
     

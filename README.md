@@ -23,5 +23,4 @@ stop - остановка автоматического обновления п
 exit - выход из приложения
 
 # Запись asciinema (ссылка)
-
-# Запись asciinema (код)
+https://asciinema.org/a/CFREdwX1exLtYR4GhU99ORfsA

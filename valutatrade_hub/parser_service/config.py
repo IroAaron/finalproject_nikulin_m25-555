@@ -13,29 +13,23 @@ class ParserConfig:
     EXCHANGERATE_API_KEY: str = os.getenv('EXCHANGERATE_API_KEY') 
  
  
-    COINGECKO_URL: str = 'https://api.coingecko.com/api/v3/simple/price'  # Без ключа
-    EXCHANGERATE_API_URL: str = 'https://v6.exchangerate-api.com/v6'  # Требует ключ
+    COINGECKO_URL: str = 'https://api.coingecko.com/api/v3/simple/price'
+    EXCHANGERATE_API_URL: str = 'https://v6.exchangerate-api.com/v6'
     
-    # Базовая валюта для запросов
     BASE_CURRENCY: str = 'USD'
     
-    # Списки отслеживаемых валют
     FIAT_CURRENCIES: Tuple[str, ...] = ('EUR', 'GBP', 'RUB', 'JPY', 'CNY')
     CRYPTO_CURRENCIES: Tuple[str, ...] = ('BTC', 'ETH', 'SOL', 'ADA', 'DOT')
     
-    # Сопоставление кодов криптовалют с ID в CoinGecko
     CRYPTO_ID_MAP: Dict[str, str] = None
     
-    # Параметры запросов
     REQUEST_TIMEOUT: int = 30
     REQUEST_RETRIES: int = 3
     RETRY_DELAY: float = 1.0
     
-    # Пути к файлам
     RATES_FILE_PATH: str = 'data/rates.json'
     HISTORY_FILE_PATH: str = 'data/exchange_rates.json'
     
-    # Параметры обновления
     UPDATE_INTERVAL_MINUTES: int = 5
     RATES_TTL_SECONDS: int = 300
     
@@ -52,7 +46,6 @@ class ParserConfig:
                 'DOT': 'polkadot'
             }
         
-        # Создаем директорию для данных если не существует
         os.makedirs(os.path.dirname(self.RATES_FILE_PATH), exist_ok=True)
     
     @classmethod
@@ -77,13 +70,11 @@ class ParserConfig:
             print('   https://app.exchangerate-api.com/sign-up')
             print('   и установите переменную окружения EXCHANGERATE_API_KEY')
         
-        # Проверяем коды валют
         if not all(currency.isalpha() and currency.isupper() 
                   for currency in self.FIAT_CURRENCIES + self.CRYPTO_CURRENCIES):
             raise ValueError('Ошибка: Коды валют должны быть в верхнем регистре ' \
             'и содержать только буквы')
         
-        # Создаем директорию для данных
         data_dir = os.path.dirname(self.RATES_FILE_PATH)
         if not os.path.exists(data_dir):
             try:

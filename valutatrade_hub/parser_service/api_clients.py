@@ -64,7 +64,6 @@ class BaseApiClient:
         raise ApiRequestError(f'Ошибка: Все попытки завершились ошибкой: {last_error}')
 
 
-# Класс для работы с CoinGecko API (наследуется от BaseApiClient)
 class CoinGeckoClient(BaseApiClient):
     '''
     Клиент для работы с CoinGecko API (без ключа)
@@ -92,7 +91,6 @@ class CoinGeckoClient(BaseApiClient):
             raise ApiRequestError(f'Ошибка: Ошибка получения данных от CoinGecko: {e}')
 
 
-# Класс для работы с xchangeRate API (наследуется от BaseApiClient)
 class ExchangeRateApiClient(BaseApiClient):
     '''
     Клиент для работы с ExchangeRate-API (требует ключ)
